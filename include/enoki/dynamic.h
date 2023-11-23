@@ -246,10 +246,7 @@ struct DynamicArrayImpl : ArrayBase<value_t<Packet_>, Derived_> {
     ENOKI_INLINE Packet &packet(size_t i) {
         #if !defined(NDEBUG) && !defined(ENOKI_DISABLE_RANGE_CHECK)
             if (i >= packets())
-                throw std::out_of_range(
-                    "DynamicArray: out of range access (tried to access packet " +
-                    std::to_string(i) + " in an array of size " +
-                    std::to_string(packets()) + ")");
+                assert(false(; // "DynamicArray: out of range access (tried to access packet " + std::to_string(i) + " in an array of size " + std::to_string(packets()) + ")"
         #endif
         return ((Packet *) ENOKI_ASSUME_ALIGNED(m_packets.get(), alignof(Packet)))[i];
     }
@@ -257,10 +254,7 @@ struct DynamicArrayImpl : ArrayBase<value_t<Packet_>, Derived_> {
     ENOKI_INLINE const Packet &packet(size_t i) const {
         #if !defined(NDEBUG) && !defined(ENOKI_DISABLE_RANGE_CHECK)
             if (i >= packets())
-                throw std::out_of_range(
-                    "DynamicArray: out of range access (tried to access packet " +
-                    std::to_string(i) + " in an array of size " +
-                    std::to_string(packets()) + ")");
+                assert(false); // "DynamicArray: out of range access (tried to access packet " + std::to_string(i) + " in an array of size " + std::to_string(packets()) + ")"
         #endif
         return ((const Packet *) ENOKI_ASSUME_ALIGNED(m_packets.get(), alignof(Packet)))[i];
     }
@@ -448,18 +442,14 @@ struct DynamicArrayImpl : ArrayBase<value_t<Packet_>, Derived_> {
             if (all(mask))
                 return t;
             else
-                throw std::runtime_error(
-                    "DynamicArray::select(): array for false branch is empty, "
-                    "and some entries were referenced.");
+                assert(false); // "DynamicArray::select(): array for false branch is empty, and some entries were referenced."
         }
 
         if (ENOKI_UNLIKELY(t.empty())) {
             if (none(mask))
                 return f;
             else
-                throw std::runtime_error(
-                    "DynamicArray::select(): array for true branch is empty, "
-                    "and some entries were referenced.");
+                assert(false); // "DynamicArray::select(): array for true branch is empty, and some entries were referenced."
         }
 
         Derived result;
@@ -772,7 +762,7 @@ struct DynamicArrayImpl : ArrayBase<value_t<Packet_>, Derived_> {
             return;
 
         if (is_mapped())
-            throw std::runtime_error("Can't resize a mapped dynamic array!");
+            assert(false); // "Can't resize a mapped dynamic array!"
 
         using CoeffValue = std::conditional_t<IsMask, bool, Value>;
 
@@ -862,8 +852,7 @@ private:
         size_t max_size = std::max({ slices(args)... });
         if ((... || (slices(args) != max_size && slices(args) != 1))) {
             #if defined(NDEBUG)
-                throw std::runtime_error(
-                    "Incompatible sizes in dynamic array operation");
+                assert(false); // "Incompatible sizes in dynamic array operation"
             #else
                 std::string msg = "[";
                 bool result[] = { ((msg += (std::to_string(slices(args)) + ", ")), false)... };
@@ -871,8 +860,7 @@ private:
                 if (msg.size() > 2)
                     msg = msg.substr(0, msg.size() - 2);
                 msg += "]";
-                throw std::runtime_error(
-                    "Incompatible sizes in dynamic array operation: " + msg);
+                assert(false); // "Incompatible sizes in dynamic array operation: " + msg
             #endif
         }
         return max_size;
@@ -975,6 +963,8 @@ struct DynamicArray : DynamicArrayImpl<Packet_, DynamicArray<Packet_>> {
     template <typename T> using ReplaceValue =
         DynamicArray<typename Packet_::template ReplaceValue<T>>;
 
+    DynamicArray() = default;
+
     DynamicArray(const DynamicArray &) = default;
     DynamicArray(DynamicArray &&) = default;
     DynamicArray &operator=(const DynamicArray &) = default;
@@ -1055,7 +1045,7 @@ auto vectorize(Func &&f, Args &&... args)
             status_combined &= s;
 
         if (!status_combined)
-            throw std::runtime_error("vectorize(): vector arguments have incompatible lengths");
+            assert(false); // "vectorize(): vector arguments have incompatible lengths"
     }
 
     using Result = make_dynamic_t<decltype(f(packet(args, 0)...))>;

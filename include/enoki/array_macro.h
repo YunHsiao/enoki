@@ -30,7 +30,8 @@
 #define ENOKI_MAP_NEXT(test, next) ENOKI_MAP_NEXT_1(ENOKI_MAP_GET_END test, next)
 #define ENOKI_EXTRACT_0(next, ...) next
 
-#if defined(_MSC_VER) // MSVC is not as eager to expand macros, hence this workaround
+// Traditional MSVC preprocessor is not as eager to expand macros, hence this workaround
+#if defined(_MSC_VER) && (!defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL)
 #define ENOKI_MAP_EXPR_NEXT_1(test, next) \
     ENOKI_EVAL_0(ENOKI_MAP_NEXT_0(test, ENOKI_MAP_COMMA next, 0))
 #define ENOKI_MAP_STMT_NEXT_1(test, next) \
@@ -309,42 +310,42 @@
         }                                                                      \
         template <typename T>                                                  \
         static ENOKI_INLINE auto slice(T &&value, size_t index) {              \
-            using Value = Struct<decltype(enoki::slice(std::declval<           \
+            using Return = Struct<decltype(enoki::slice(std::declval<          \
                 ArgType<T, Args>>(), index))...>;                              \
-            return Value(ENOKI_MAP_EXPR_F2(enoki::slice, value, index,         \
+            return Return(ENOKI_MAP_EXPR_F2(enoki::slice, value, index,        \
                                            __VA_ARGS__));                      \
         }                                                                      \
         template <typename T>                                                  \
         static ENOKI_INLINE auto slice_ptr(T &&value, size_t index) {          \
-            using Value = Struct<decltype(enoki::slice_ptr(std::declval<       \
+            using Return = Struct<decltype(enoki::slice_ptr(std::declval<      \
                 ArgType<T, Args>>(), index))...>;                              \
-            return Value(ENOKI_MAP_EXPR_F2(enoki::slice_ptr, value, index,     \
+            return Return(ENOKI_MAP_EXPR_F2(enoki::slice_ptr, value, index,    \
                                            __VA_ARGS__));                      \
         }                                                                      \
         template <typename T>                                                  \
         static ENOKI_INLINE auto packet(T &&value, size_t index) {             \
-            using Value = Struct<decltype(enoki::packet(std::declval<          \
+            using Return = Struct<decltype(enoki::packet(std::declval<         \
                 ArgType<T, Args>>(), index))...>;                              \
-            return Value(ENOKI_MAP_EXPR_F2(enoki::packet, value, index,        \
+            return Return(ENOKI_MAP_EXPR_F2(enoki::packet, value, index,       \
                                            __VA_ARGS__));                      \
         }                                                                      \
         template <typename T> static ENOKI_INLINE auto ref_wrap(T &&value) {   \
-            using Value = Struct<decltype(enoki::ref_wrap(std::declval<        \
+            using Return = Struct<decltype(enoki::ref_wrap(std::declval<       \
                 ArgType<T, Args>>()))...>;                                     \
-            return Value(ENOKI_MAP_EXPR_F1(enoki::ref_wrap, value,             \
+            return Return(ENOKI_MAP_EXPR_F1(enoki::ref_wrap, value,            \
                                            __VA_ARGS__));                      \
         }                                                                      \
         template <typename T> static ENOKI_INLINE auto detach(T &&value) {     \
-            using Value = Struct<decltype(enoki::detach(std::declval<          \
+            using Return = Struct<decltype(enoki::detach(std::declval<         \
                 ArgType<T, Args>>()))...>;                                     \
-            return Value(ENOKI_MAP_EXPR_F1(enoki::detach, value,               \
+            return Return(ENOKI_MAP_EXPR_F1(enoki::detach, value,              \
                                            __VA_ARGS__));                      \
         }                                                                      \
         template <typename T, typename M> static ENOKI_INLINE                  \
         auto masked(T& value, const M & mask) {                                \
-            using Value = Struct<decltype(enoki::masked(                       \
+            using Return = Struct<decltype(enoki::masked(                      \
                         std::declval<Args &>(), mask))...>;                    \
-            return Value(ENOKI_MAP_EXPR_F2(enoki::masked,                      \
+            return Return(ENOKI_MAP_EXPR_F2(enoki::masked,                     \
                                            value, mask, __VA_ARGS__) );        \
         }                                                                      \
         static ENOKI_INLINE auto zero(size_t size) {                           \

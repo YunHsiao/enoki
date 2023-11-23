@@ -1299,7 +1299,7 @@ template <typename T> scalar_t<T> scalar_cast(const T &v) {
     static_assert(array_depth_v<T> <= 1);
     if constexpr (is_array_v<T>) {
         if (v.size() != 1)
-            throw std::runtime_error("scalar_cast(): array should be of size 1!");
+            assert(false); // scalar_cast(): array should be of size 1!
         return v.coeff(0);
     } else {
         return v;

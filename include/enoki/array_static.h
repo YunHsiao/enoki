@@ -66,7 +66,7 @@ struct StaticArrayBase : ArrayBase<Value_, Derived_> {
 
     void resize(size_t size) {
         if (size != Derived::Size)
-            throw std::length_error("Incompatible size for static array");
+            assert(false); // Incompatible size for static array
     }
 
     // -----------------------------------------------------------------------
@@ -181,7 +181,7 @@ struct StaticArrayBase : ArrayBase<Value_, Derived_> {
         Derived result;
         ENOKI_CHKSCALAR("or");
         for (size_t i = 0; i < Derived::Size; ++i)
-            (Value &) result.coeff(i) =
+            (Value &) result.coeff(i) = (Value)
                 detail::or_((const Value &) derived().coeff(i), d.coeff(i));
         return result;
     }
@@ -192,7 +192,7 @@ struct StaticArrayBase : ArrayBase<Value_, Derived_> {
         ENOKI_CHKSCALAR("and");
         Derived result;
         for (size_t i = 0; i < Derived::Size; ++i)
-            (Value &) result.coeff(i) =
+            (Value &) result.coeff(i) = (Value)
                 detail::and_((const Value &) derived().coeff(i), d.coeff(i));
         return result;
     }
@@ -214,7 +214,7 @@ struct StaticArrayBase : ArrayBase<Value_, Derived_> {
         ENOKI_CHKSCALAR("xor");
         Derived result;
         for (size_t i = 0; i < Derived::Size; ++i)
-            (Value &) result.coeff(i) =
+            (Value &) result.coeff(i) = (Value)
                 detail::xor_((const Value &) derived().coeff(i), d.coeff(i));
         return result;
     }
